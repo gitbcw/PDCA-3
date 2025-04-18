@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  password  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  goals     Goal[]
+  messages  Message[]
+  tasks     Task[]
+
+  @@map("users")
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?    @map("due_date")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  userId      String       @map("user_id")
+  parentId    String?      @map("parent_task_id")
+  goalId      String?      @map("goal_id")
+  metadata    Json?        @default("{}")
+  goal        Goal?        @relation(fields: [goalId], references: [id])
+  parent      Task?        @relation("SubTasks", fields: [parentId], references: [id])
+  subTasks    Task[]       @relation("SubTasks")
+  user        User         @relation(fields: [userId], references: [id])
+  tags        Tag[]        @relation("TaskTags")
+
+  @@map("tasks")
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  level       GoalLevel  @default(MONTHLY)
+  status      GoalStatus @default(ACTIVE)
+  startDate   DateTime   @map("start_date")
+  endDate     DateTime   @map("end_date")
+  progress    Float      @default(0)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  userId      String     @map("user_id")
+  parentId    String?    @map("parent_goal_id")
+  metrics     Json?      @default("[]")
+  resources   Json?      @default("[]")
+  priority    Int        @default(1)
+  weight      Float      @default(1.0)
+  metadata    Json?      @default("{}")
+  parent      Goal?      @relation("SubGoals", fields: [parentId], references: [id])
+  subGoals    Goal[]     @relation("SubGoals")
+  user        User       @relation(fields: [userId], references: [id])
+  tasks       Task[]
+  tags        Tag[]      @relation("GoalTags")
+
+  @@map("goals")
+}
+
+model Message {
+  id         String    @id @default(uuid())
+  content    String
+  sourceType String    @map("source_type")
+  sourceId   String?   @map("source_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  userId     String    @map("user_id")
+  categoryId String?   @map("category_id")
+  metadata   Json?     @default("{}")
+  category   Category? @relation(fields: [categoryId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+  tags       Tag[]     @relation("MessageTags")
+
+  @@map("messages")
+}
+
+model Category {
+  id            String     @id @default(uuid())
+  name          String
+  description   String?
+  parentId      String?    @map("parent_id")
+  sourceType    String?    @map("source_type")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  parent        Category?  @relation("SubCategories", fields: [parentId], references: [id])
+  subCategories Category[] @relation("SubCategories")
+  messages      Message[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  name      String
+  color     String?   @default("#888888")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  goals     Goal[]    @relation("GoalTags")
+  messages  Message[] @relation("MessageTags")
+  tasks     Task[]    @relation("TaskTags")
+
+  @@map("tags")
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum GoalLevel {
+  VISION
+  YEARLY
+  QUARTERLY
+  MONTHLY
+  WEEKLY
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  ARCHIVED
+}

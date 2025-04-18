@@ -5,10 +5,9 @@ import { ExternalLink } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Sidebar } from "@/components/Sidebar";
+import AuthProvider from "@/components/auth/AuthProvider";
 
 const publicSans = Public_Sans({ subsets: ["latin"] });
-
-
 
 export default function RootLayout({
   children,
@@ -39,44 +38,46 @@ export default function RootLayout({
         <meta name="twitter:image" content="/images/og-image.png" />
       </head>
       <body className={publicSans.className}>
-        <NuqsAdapter>
-          <div className="flex h-[100dvh] overflow-hidden">
-            {/* Sidebar */}
-            <Sidebar />
+        <AuthProvider>
+          <NuqsAdapter>
+            <div className="flex h-[100dvh] overflow-hidden">
+              {/* Sidebar */}
+              <Sidebar />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col md:ml-64">
-              {/* Header */}
-              <header className="bg-secondary p-4 border-b">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-xl font-bold md:hidden">PDCA 助手</h1>
+              {/* Main Content */}
+              <div className="flex-1 flex flex-col md:ml-64">
+                {/* Header */}
+                <header className="bg-secondary p-4 border-b">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-xl font-bold md:hidden">PDCA 助手</h1>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button asChild variant="outline" size="sm">
+                        <a
+                          href="https://github.com/your-username/PDCA-3"
+                          target="_blank"
+                        >
+                          <ExternalLink className="size-3 mr-1" />
+                          <span>GitHub</span>
+                        </a>
+                      </Button>
+                    </div>
                   </div>
+                </header>
 
-                  <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm">
-                      <a
-                        href="https://github.com/your-username/PDCA-3"
-                        target="_blank"
-                      >
-                        <ExternalLink className="size-3 mr-1" />
-                        <span>GitHub</span>
-                      </a>
-                    </Button>
+                {/* Content */}
+                <main className="flex-1 overflow-auto p-4">
+                  <div className="max-w-7xl mx-auto">
+                    {children}
                   </div>
-                </div>
-              </header>
-
-              {/* Content */}
-              <main className="flex-1 overflow-auto p-4">
-                <div className="max-w-7xl mx-auto">
-                  {children}
-                </div>
-              </main>
+                </main>
+              </div>
             </div>
-          </div>
-          <Toaster />
-        </NuqsAdapter>
+            <Toaster />
+          </NuqsAdapter>
+        </AuthProvider>
       </body>
     </html>
   );

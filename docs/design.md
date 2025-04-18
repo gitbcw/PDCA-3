@@ -2,7 +2,7 @@
 
 ## 系统概述
 
-PDCA 个人助手系统是一个基于 AI 的个人生产力工具，集成任务管理、信息收集、智能分析和游戏化元素。系统采用前后端分离架构，前端使用 React + TypeScript 后端使用 Python + FastAPI + PostgreSQL。
+PDCA 个人助手系统是一个基于 AI 的个人生产力工具，集成任务管理、信息收集、智能分析和游戏化元素。系统采用前后端一体化架构，使用 Next.js + TypeScript，后端使用 Prisma ORM 连接 PostgreSQL。
 
 ## 核心功能模块设计
 
@@ -312,41 +312,45 @@ Decision -> Agent -> Feedback
 
 ### 前端架构
 
-- **框架**：React + TypeScript
-- **状态管理**：Redux Toolkit
-- **UI 组件**：TailwindCSS
-- **路由**：React Router
-- **API 通信**：Axios
+- **框架**：Next.js + TypeScript
+- **UI 组件**：TailwindCSS + Radix UI
+- **状态管理**：React Context + Hooks
+- **路由**：Next.js App Router
+- **API 通信**：Next.js API Routes
 
 ### 后端架构
 
-- **框架**：FastAPI
-- **数据库 ORM**：SQLAlchemy
-- **认证**：JWT
-- **API 文档**：Swagger UI
-- **数据验证**：Pydantic
+- **框架**：Next.js API Routes
+- **数据库 ORM**：Prisma
+- **认证**：NextAuth.js
+- **数据验证**：Zod
+- **AI 框架**：LangChain.js
 
 ### 数据库设计
 
 - **主数据库**：PostgreSQL
-- **缓存**：Redis（可选）
-- **主要表结构**：Users, Tasks, Messages, Tags, Settings
+- **主要表结构**：Users, Goals, Tasks, Messages, Tags
 
 ### AI 集成
 
-- **默认服务**：OpenAI API
+- **支持的LLM提供商**：
+  - OpenAI API
+  - Anthropic API
+  - 智谱AI GLM-4 API
+  - 自定义LLM API
 - **功能应用**：文本生成、摘要、分类、决策支持
 
 ## 安全设计
 
-- **认证**：JWT 令牌
-- **授权**：基于角色的访问控制
+- **认证**：NextAuth.js
+- **授权**：基于会话的访问控制
 - **数据保护**：加密敏感数据
-- **API 安全**：速率限制、CORS 配置
+- **API 安全**：Next.js API Routes 内置保护
 
 ## 扩展性设计
 
 - **模块化架构**：便于添加新功能
 - **插件系统**：支持第三方扩展（计划中）
-- **API 设计**：RESTful API 便于集成
-- **配置系统**：可自定义系统行为
+- **API 设计**：Next.js API Routes 便于集成
+- **配置系统**：基于环境变量的可自定义系统行为
+- **LLM 提供商扩展**：工厂模式支持轻松添加新的LLM提供商

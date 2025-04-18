@@ -14,9 +14,15 @@ import {
   Users,
   Lightbulb,
   Menu,
-  X
+  X,
+  Database,
+  Target,
+  MessageSquare
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "next-auth/react";
+import { toast } from "sonner";
 
 interface SidebarLinkProps {
   href: string;
@@ -45,7 +51,13 @@ const SidebarLink = ({ href, icon, children, onClick }: SidebarLinkProps) => {
 };
 
 export function Sidebar() {
+  const { isAuthenticated, user, isLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+
+  // 添加调试日志
+  useEffect(() => {
+    console.log("Sidebar - Auth state:", { isAuthenticated, isLoading, userId: user?.id });
+  }, [isAuthenticated, isLoading, user]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -91,13 +103,16 @@ export function Sidebar() {
             <SidebarLink href="/" icon={<Home className="h-5 w-5" />} onClick={closeSidebar}>
               首页
             </SidebarLink>
-            
+
             <div className="pt-4 pb-2">
               <p className="px-3 text-xs font-medium text-muted-foreground">PDCA 循环</p>
             </div>
-            
+
             <SidebarLink href="/plan" icon={<ClipboardList className="h-5 w-5" />} onClick={closeSidebar}>
               计划 (Plan)
+            </SidebarLink>
+            <SidebarLink href="/goal-chat" icon={<MessageSquare className="h-5 w-5" />} onClick={closeSidebar}>
+              目标对话
             </SidebarLink>
             <SidebarLink href="/do" icon={<Calendar className="h-5 w-5" />} onClick={closeSidebar}>
               执行 (Do)
@@ -108,11 +123,11 @@ export function Sidebar() {
             <SidebarLink href="/act" icon={<Lightbulb className="h-5 w-5" />} onClick={closeSidebar}>
               改进 (Act)
             </SidebarLink>
-            
+
             <div className="pt-4 pb-2">
               <p className="px-3 text-xs font-medium text-muted-foreground">更多功能</p>
             </div>
-            
+
             <SidebarLink href="/examples" icon={<BookOpen className="h-5 w-5" />} onClick={closeSidebar}>
               示例
             </SidebarLink>
@@ -122,9 +137,32 @@ export function Sidebar() {
             <SidebarLink href="/settings" icon={<Settings className="h-5 w-5" />} onClick={closeSidebar}>
               设置
             </SidebarLink>
+            <SidebarLink href="/admin/database" icon={<Database className="h-5 w-5" />} onClick={closeSidebar}>
+              数据库
+            </SidebarLink>
           </nav>
 
           <div className="pt-4 border-t">
+            {isAuthenticated && (
+              <div className="px-3 py-2 mb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{user?.name || user?.email}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      signOut({ redirect: true, callbackUrl: "/login" });
+                      toast.success("已成功登出");
+                    }}
+                  >
+                    登出
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="px-3 py-2">
               <p className="text-xs text-muted-foreground">© 2024 PDCA 助手</p>
             </div>
@@ -134,7 +172,7 @@ export function Sidebar() {
 
       {/* Overlay for mobile */}
       {isOpen && (
-        <div 
+        <div
           className="md:hidden fixed inset-0 bg-black/50 z-30"
           onClick={closeSidebar}
         />
