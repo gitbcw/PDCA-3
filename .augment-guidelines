@@ -1,0 +1,14 @@
+
+## 开发环境配置
+开发环境
+Windows-无wsl
+Node >=16
+
+
+## 注意！
+- 尽量只做用户明确告诉你做的事情，对于用户没有要求的，征询用户的意见后再做
+- 在每次对话结束时更新 docs/progress.md和docs/log.md, progress.md根据具体的进度情况进行更新，如果只是bug修复这类问题，不涉及进度更新则不更新progress.md
+- log.md的时间戳使用系统时间
+- 我们的环境中没有wsl，是windows，所以没办法使用docker
+
+
